@@ -21,6 +21,7 @@ import java.util.Date;
 public class MainActivity extends BaseActivity {
 
     private DaoMaster daoMaster;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,13 +34,13 @@ public class MainActivity extends BaseActivity {
         MySQLiteOpenHelper helper = new MySQLiteOpenHelper(this, "test.db",
                 null);
         daoMaster = new DaoMaster(helper.getEncryptedWritableDb("12342"));
-        TestData2 testData2 = new TestData2(0L, "12342", 123L, new Date(), 1234, true);
+        TestData2 testData2 = new TestData2(null, "12342", "", 123L, new Date(), 1234, 18, false, false, false, false, true);
+//        TestData2 testData2 = new TestData2(null, "12342", 123L, new Date(), 1234, 18, false, false, false, false, true);
         TestData2Dao testData2Dao = daoMaster.newSession().getTestData2Dao();
         testData2Dao.insert(testData2);
 
         Log.d("MigrationHelper", "TestData2 " + testData2Dao.loadAll().toString());
     }
-
 
 
     @Override

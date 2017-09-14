@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.yuweiguocn.library.greendao.callback.MigrationOperationCallback;
+
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.StandardDatabase;
@@ -17,24 +19,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * 
  * please call {@link #migrate(SQLiteDatabase, Class[])} or {@link #migrate(Database, Class[])}
- * 
  */
 public final class MigrationHelper {
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;//打包时请关闭
     private static String TAG = "MigrationHelper";
     private static final String SQLITE_MASTER = "sqlite_master";
     private static final String SQLITE_TEMP_MASTER = "sqlite_temp_master";
 
     private static WeakReference<ReCreateAllTableListener> weakListener;
 
-    public interface ReCreateAllTableListener{
+    private static WeakReference<MigrationOperationCallback> weakOperationListener;
+
+    public interface ReCreateAllTableListener {
         void onCreateAllTables(Database db, boolean ifNotExists);
+
         void onDropAllTables(Database db, boolean ifExists);
     }
 
@@ -52,6 +56,11 @@ public final class MigrationHelper {
     public static void migrate(Database database, ReCreateAllTableListener listener, Class<? extends AbstractDao<?, ?>>... daoClasses) {
         weakListener = new WeakReference<>(listener);
         migrate(database, daoClasses);
+    }
+
+    public static void migrate(Database database, ReCreateAllTableListener listener, MigrationOperationCallback operationCallback, Class<? extends AbstractDao<?, ?>>... daoClasses) {
+        weakOperationListener = new WeakReference<>(operationCallback);
+        migrate(database, listener, daoClasses);
     }
 
     public static void migrate(Database database, Class<? extends AbstractDao<?, ?>>... daoClasses) {
@@ -94,7 +103,7 @@ public final class MigrationHelper {
                 insertTableStringBuilder.append("CREATE TEMPORARY TABLE ").append(tempTableName);
                 insertTableStringBuilder.append(" AS SELECT * FROM ").append(tableName).append(";");
                 db.execSQL(insertTableStringBuilder.toString());
-                printLog("【Table】" + tableName +"\n ---Columns-->"+getColumnsStr(daoConfig));
+                printLog("【Table】" + tableName + "\n ---Columns-->" + getColumnsStr(daoConfig));
                 printLog("【Generate temp table】" + tempTableName);
             } catch (SQLException e) {
                 Log.e(TAG, "【Failed to generate temp table】" + tempTableName, e);
@@ -108,7 +117,7 @@ public final class MigrationHelper {
         }
         String dbName = isTemp ? SQLITE_TEMP_MASTER : SQLITE_MASTER;
         String sql = "SELECT COUNT(*) FROM " + dbName + " WHERE type = ? AND name = ?";
-        Cursor cursor=null;
+        Cursor cursor = null;
         int count = 0;
         try {
             cursor = db.rawQuery(sql, new String[]{"table", tableName});
@@ -186,13 +195,38 @@ public final class MigrationHelper {
             try {
                 // get all columns from tempTable, take careful to use the columns list
                 List<String> columns = getColumns(db, tempTableName);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("old table columns{");
+                for (int index = 0; index < columns.size(); index++) {
+                    //打印旧表的字段
+                    stringBuilder.append(columns.get(index)).append(",");
+                }
+                stringBuilder.append("}");
+                printLog(stringBuilder.toString());
+
+
+                //1. 新表的字段
+                List<String> newColumsList = new ArrayList<>();
+                StringBuilder stringBuilder1 = new StringBuilder();
+                stringBuilder1.append("new table columns{");
+                for (int index = 0; index < daoConfig.properties.length; index++) {
+                    //打印新表的字段
+                    newColumsList.add(daoConfig.properties[index].columnName);
+                    stringBuilder1.append(daoConfig.properties[index].columnName).append(",");
+                }
+                stringBuilder1.append("}");
+                printLog(stringBuilder1.toString());
+
                 ArrayList<String> properties = new ArrayList<>(columns.size());
+
                 for (int j = 0; j < daoConfig.properties.length; j++) {
                     String columnName = daoConfig.properties[j].columnName;
                     if (columns.contains(columnName)) {
                         properties.add(columnName);
                     }
                 }
+
                 if (properties.size() > 0) {
                     final String columnSQL = TextUtils.join(",", properties);
 
@@ -204,6 +238,36 @@ public final class MigrationHelper {
                     insertTableStringBuilder.append(" FROM ").append(tempTableName).append(";");
                     db.execSQL(insertTableStringBuilder.toString());
                     printLog("【Restore data】 to " + tableName);
+                }
+
+                //// TODO: 2017/9/13 加入新表有多余的列需要操作，这里可以让使用者自定义逻辑
+                /**
+                 * 例如：
+                 *  项目新加入了一个字段名为 urlMd5，该字段依赖于原先字段url的值。当旧表的数据迁移过来，之后希望填充新列的值
+                 *  以此为例。
+                 */
+                if (weakOperationListener != null) {
+                    MigrationOperationCallback operationCallback = weakOperationListener.get();
+                    if (operationCallback != null) {//执行sql命令
+
+                        List<String> tempList = new ArrayList<>(newColumsList);
+//                        Collections.copy(tempList, newColumsList);
+
+                        newColumsList.retainAll(columns);
+                        tempList.removeAll(newColumsList);//求补集
+                        printLog("新表中字段与旧表的补集为：{" + tempList.toString() + "}");
+                        if (tempList != null && tempList.size() > 0) {
+
+                            //自定义执行
+                            for (String column : tempList) {
+                                String sql = operationCallback.onNewColumnSetting(tableName, column);
+                                if (!TextUtils.isEmpty(sql)) {//sql 不为空 保证能够执行的前提下才能玩
+                                    printLog(sql);
+                                    db.execSQL(sql);
+                                }
+                            }
+                        }
+                    }
                 }
                 StringBuilder dropTableStringBuilder = new StringBuilder();
                 dropTableStringBuilder.append("DROP TABLE ").append(tempTableName);
@@ -234,8 +298,8 @@ public final class MigrationHelper {
         return columns;
     }
 
-    private static void printLog(String info){
-        if(DEBUG){
+    private static void printLog(String info) {
+        if (DEBUG) {
             Log.d(TAG, info);
         }
     }

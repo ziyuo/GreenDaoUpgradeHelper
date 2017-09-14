@@ -21,7 +21,7 @@ import com.github.yuweiguocn.demo.greendao.db.TestData3Dao;
 /**
  * {@inheritDoc}
  * 
- * @see AbstractDaoSession
+ * @see org.greenrobot.greendao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
 

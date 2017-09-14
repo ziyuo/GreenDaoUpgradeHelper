@@ -24,10 +24,16 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property TestString = new Property(1, String.class, "testString", false, "TEST_STRING");
-        public final static Property TestLong = new Property(2, Long.class, "testLong", false, "TEST_LONG");
-        public final static Property TestDate = new Property(3, java.util.Date.class, "testDate", false, "TEST_DATE");
-        public final static Property TestInt = new Property(4, Integer.class, "testInt", false, "TEST_INT");
-        public final static Property TestBoolean = new Property(5, Boolean.class, "testBoolean", false, "TEST_BOOLEAN");
+        public final static Property Md5String = new Property(2, String.class, "md5String", false, "MD5_STRING");
+        public final static Property TestLong = new Property(3, Long.class, "testLong", false, "TEST_LONG");
+        public final static Property TestDate = new Property(4, java.util.Date.class, "testDate", false, "TEST_DATE");
+        public final static Property TestInt = new Property(5, Integer.class, "testInt", false, "TEST_INT");
+        public final static Property AgeInt = new Property(6, Integer.class, "ageInt", false, "AGE_INT");
+        public final static Property FavorBoolean = new Property(7, Boolean.class, "favorBoolean", false, "FAVOR_BOOLEAN");
+        public final static Property HahaBoolean = new Property(8, Boolean.class, "hahaBoolean", false, "HAHA_BOOLEAN");
+        public final static Property BbBoolean = new Property(9, Boolean.class, "bbBoolean", false, "BB_BOOLEAN");
+        public final static Property CcBoolean = new Property(10, Boolean.class, "ccBoolean", false, "CC_BOOLEAN");
+        public final static Property TestBoolean = new Property(11, Boolean.class, "testBoolean", false, "TEST_BOOLEAN");
     }
 
 
@@ -45,10 +51,16 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"TEST_DATA2\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"TEST_STRING\" TEXT," + // 1: testString
-                "\"TEST_LONG\" INTEGER," + // 2: testLong
-                "\"TEST_DATE\" INTEGER," + // 3: testDate
-                "\"TEST_INT\" INTEGER," + // 4: testInt
-                "\"TEST_BOOLEAN\" INTEGER);"); // 5: testBoolean
+                "\"MD5_STRING\" TEXT," + // 2: md5String
+                "\"TEST_LONG\" INTEGER," + // 3: testLong
+                "\"TEST_DATE\" INTEGER," + // 4: testDate
+                "\"TEST_INT\" INTEGER," + // 5: testInt
+                "\"AGE_INT\" INTEGER," + // 6: ageInt
+                "\"FAVOR_BOOLEAN\" INTEGER," + // 7: favorBoolean
+                "\"HAHA_BOOLEAN\" INTEGER," + // 8: hahaBoolean
+                "\"BB_BOOLEAN\" INTEGER," + // 9: bbBoolean
+                "\"CC_BOOLEAN\" INTEGER," + // 10: ccBoolean
+                "\"TEST_BOOLEAN\" INTEGER);"); // 11: testBoolean
     }
 
     /** Drops the underlying database table. */
@@ -71,24 +83,54 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
             stmt.bindString(2, testString);
         }
  
+        String md5String = entity.getMd5String();
+        if (md5String != null) {
+            stmt.bindString(3, md5String);
+        }
+ 
         Long testLong = entity.getTestLong();
         if (testLong != null) {
-            stmt.bindLong(3, testLong);
+            stmt.bindLong(4, testLong);
         }
  
         java.util.Date testDate = entity.getTestDate();
         if (testDate != null) {
-            stmt.bindLong(4, testDate.getTime());
+            stmt.bindLong(5, testDate.getTime());
         }
  
         Integer testInt = entity.getTestInt();
         if (testInt != null) {
-            stmt.bindLong(5, testInt);
+            stmt.bindLong(6, testInt);
+        }
+ 
+        Integer ageInt = entity.getAgeInt();
+        if (ageInt != null) {
+            stmt.bindLong(7, ageInt);
+        }
+ 
+        Boolean favorBoolean = entity.getFavorBoolean();
+        if (favorBoolean != null) {
+            stmt.bindLong(8, favorBoolean ? 1L: 0L);
+        }
+ 
+        Boolean hahaBoolean = entity.getHahaBoolean();
+        if (hahaBoolean != null) {
+            stmt.bindLong(9, hahaBoolean ? 1L: 0L);
+        }
+ 
+        Boolean bbBoolean = entity.getBbBoolean();
+        if (bbBoolean != null) {
+            stmt.bindLong(10, bbBoolean ? 1L: 0L);
+        }
+ 
+        Boolean ccBoolean = entity.getCcBoolean();
+        if (ccBoolean != null) {
+            stmt.bindLong(11, ccBoolean ? 1L: 0L);
         }
  
         Boolean testBoolean = entity.getTestBoolean();
         if (testBoolean != null) {
-            stmt.bindLong(6, testBoolean ? 1L: 0L);
+            stmt.bindLong(12, testBoolean ? 1L: 0L);
         }
     }
 
@@ -106,24 +148,54 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
             stmt.bindString(2, testString);
         }
  
+        String md5String = entity.getMd5String();
+        if (md5String != null) {
+            stmt.bindString(3, md5String);
+        }
+ 
         Long testLong = entity.getTestLong();
         if (testLong != null) {
-            stmt.bindLong(3, testLong);
+            stmt.bindLong(4, testLong);
         }
  
         java.util.Date testDate = entity.getTestDate();
         if (testDate != null) {
-            stmt.bindLong(4, testDate.getTime());
+            stmt.bindLong(5, testDate.getTime());
         }
  
         Integer testInt = entity.getTestInt();
         if (testInt != null) {
-            stmt.bindLong(5, testInt);
+            stmt.bindLong(6, testInt);
+        }
+ 
+        Integer ageInt = entity.getAgeInt();
+        if (ageInt != null) {
+            stmt.bindLong(7, ageInt);
+        }
+ 
+        Boolean favorBoolean = entity.getFavorBoolean();
+        if (favorBoolean != null) {
+            stmt.bindLong(8, favorBoolean ? 1L: 0L);
+        }
+ 
+        Boolean hahaBoolean = entity.getHahaBoolean();
+        if (hahaBoolean != null) {
+            stmt.bindLong(9, hahaBoolean ? 1L: 0L);
+        }
+ 
+        Boolean bbBoolean = entity.getBbBoolean();
+        if (bbBoolean != null) {
+            stmt.bindLong(10, bbBoolean ? 1L: 0L);
+        }
+ 
+        Boolean ccBoolean = entity.getCcBoolean();
+        if (ccBoolean != null) {
+            stmt.bindLong(11, ccBoolean ? 1L: 0L);
         }
  
         Boolean testBoolean = entity.getTestBoolean();
         if (testBoolean != null) {
-            stmt.bindLong(6, testBoolean ? 1L: 0L);
+            stmt.bindLong(12, testBoolean ? 1L: 0L);
         }
     }
 
@@ -137,10 +209,16 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
         TestData2 entity = new TestData2( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // testString
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // testLong
-            cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)), // testDate
-            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // testInt
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // testBoolean
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // md5String
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // testLong
+            cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)), // testDate
+            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // testInt
+            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // ageInt
+            cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0, // favorBoolean
+            cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0, // hahaBoolean
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // bbBoolean
+            cursor.isNull(offset + 10) ? null : cursor.getShort(offset + 10) != 0, // ccBoolean
+            cursor.isNull(offset + 11) ? null : cursor.getShort(offset + 11) != 0 // testBoolean
         );
         return entity;
     }
@@ -149,10 +227,16 @@ public class TestData2Dao extends AbstractDao<TestData2, Long> {
     public void readEntity(Cursor cursor, TestData2 entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTestString(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setTestLong(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setTestDate(cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)));
-        entity.setTestInt(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
-        entity.setTestBoolean(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setMd5String(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setTestLong(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setTestDate(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setTestInt(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
+        entity.setAgeInt(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
+        entity.setFavorBoolean(cursor.isNull(offset + 7) ? null : cursor.getShort(offset + 7) != 0);
+        entity.setHahaBoolean(cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0);
+        entity.setBbBoolean(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
+        entity.setCcBoolean(cursor.isNull(offset + 10) ? null : cursor.getShort(offset + 10) != 0);
+        entity.setTestBoolean(cursor.isNull(offset + 11) ? null : cursor.getShort(offset + 11) != 0);
      }
     
     @Override
